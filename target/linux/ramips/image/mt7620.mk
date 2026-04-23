@@ -55,7 +55,7 @@ define Device/alfa-network_tube-e4g
   DEVICE_VENDOR := ALFA Network
   DEVICE_MODEL := Tube-E4G
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci uboot-envtools uqmi -iwinfo \
-	-kmod-rt2800-soc -wpad-basic-openssl
+	-kmod-rt2800-soc -wpad-openssl
   SUPPORTED_DEVICES += tube-e4g
 endef
 TARGET_DEVICES += alfa-network_tube-e4g
@@ -217,6 +217,15 @@ define Device/comfast_cf-wr800n
 endef
 TARGET_DEVICES += comfast_cf-wr800n
 
+define Device/devolo_rac
+  SOC := mt7620a
+  IMAGE_SIZE := 7872k
+  DEVICE_VENDOR := devolo
+  DEVICE_MODEL := WiFi Repeater ac
+  DEVICE_PACKAGES := kmod-mt76x2 kmod-phy-realtek
+endef
+TARGET_DEVICES += devolo_rac
+
 define Device/dlink_dch-m225
   $(Device/seama)
   SOC := mt7620a
@@ -254,6 +263,7 @@ define Device/dlink_dir-806a-b1
   IMAGES += factory.bin
   IMAGE/factory.bin := append-kernel | append-rootfs | pad-rootfs | check-size | \
 	sign-dlink-ru cef285a2e29e40b2baab31277d44298b
+  DEFAULT := n
 endef
 TARGET_DEVICES += dlink_dir-806a-b1
 
@@ -614,6 +624,18 @@ define Device/hnet_c108
 endef
 TARGET_DEVICES += hnet_c108
 
+define Device/hongdian_h8922-v30
+  SOC := mt7620a
+  IMAGE_SIZE := 15808k
+  DEVICE_VENDOR := Hongdian
+  DEVICE_MODEL := H8922
+  DEVICE_VARIANT := v30
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi uboot-envtools
+  IMAGES += rootfs.bin
+  IMAGE/rootfs.bin := append-rootfs | check-size 10560k
+endef
+TARGET_DEVICES += hongdian_h8922-v30
+
 define Device/humax_e2
   SOC := mt7620a
   IMAGE_SIZE := 7744k
@@ -793,6 +815,7 @@ define Device/linksys_e1700
   DEVICE_VENDOR := Linksys
   DEVICE_MODEL := E1700
   SUPPORTED_DEVICES += e1700
+  DEFAULT := n
 endef
 TARGET_DEVICES += linksys_e1700
 
@@ -929,6 +952,7 @@ define Device/netgear_wn3100rp-v2
   DEVICE_VENDOR := NETGEAR
   DEVICE_MODEL := WN3100RP
   DEVICE_VARIANT := v2
+  DEFAULT := n
 endef
 TARGET_DEVICES += netgear_wn3100rp-v2
 
@@ -1133,10 +1157,12 @@ define Device/rostelecom_rt-fl-1
   $(Device/sercomm_cpj)
   DEVICE_MODEL := RT-FL-1
   DEVICE_ALT0_MODEL := RT-FL-1
+ifeq ($(IB),)
   ARTIFACT/initramfs-factory.img := \
 	append-image-stage initramfs-kernel.bin | check-size | \
 	sercomm-factory-cpj | gzip | sercomm-payload | \
 	sercomm-pid-setbit 0x11 | sercomm-crypto
+endif
 endef
 TARGET_DEVICES += rostelecom_rt-fl-1
 
@@ -1144,9 +1170,11 @@ define Device/rostelecom_s1010
   $(Device/sercomm_cpj)
   DEVICE_MODEL := S1010
   DEVICE_ALT0_MODEL := S1010.RT
+ifeq ($(IB),)
   ARTIFACT/initramfs-factory.img := \
 	append-image-stage initramfs-kernel.bin | check-size | \
 	sercomm-factory-cpj | gzip | sercomm-payload | sercomm-crypto
+endif
 endef
 TARGET_DEVICES += rostelecom_s1010
 
@@ -1608,6 +1636,7 @@ define Device/zyxel_keenetic-lite-iii-a
   IMAGES += factory.bin
   IMAGE/factory.bin := $$(sysupgrade_bin) | pad-to 64k | check-size | \
 		zyimage -d 2102018 -v "ZyXEL Keenetic Lite III"
+  DEFAULT := n
 endef
 TARGET_DEVICES += zyxel_keenetic-lite-iii-a
 

@@ -35,6 +35,7 @@ case "$FIRMWARE" in
 	xiaomi,ax3600|\
 	xiaomi,ax3600-stock|\
 	xiaomi,ax9000|\
+	xiaomi,ax9000-stock|\
 	yuncore,ax880|\
 	zte,mf269|\
 	zte,mf269-stock)
@@ -48,7 +49,7 @@ case "$FIRMWARE" in
 		;;
 	linksys,mx4200v2)
 		caldata_extract "0:art" 0x1000 0x20000
-		label_mac=$(mtd_get_mac_ascii devinfo hw_mac_addr)
+		label_mac=$(get_mac_label)
 		ath11k_patch_mac $(macaddr_add $label_mac 2) 0
 		ath11k_patch_mac $(macaddr_add $label_mac 1) 1
 		ath11k_patch_mac $(macaddr_add $label_mac 3) 2
@@ -57,7 +58,7 @@ case "$FIRMWARE" in
 		;;
 	linksys,mx4300)
 		caldata_extract "0:art" 0x1000 0x20000
-		label_mac=$(mtd_get_mac_ascii devinfo hw_mac_addr)
+		label_mac=$(get_mac_label)
 		ath11k_patch_mac $(macaddr_add $label_mac 2) 0
 		ath11k_patch_mac $(macaddr_add $label_mac 1) 1
 		ath11k_patch_mac $(macaddr_add $label_mac 3) 2
@@ -68,6 +69,15 @@ case "$FIRMWARE" in
 		ath11k_patch_mac $(mtd_get_mac_binary boarddata1 0xc) 0
 		ath11k_patch_mac $(mtd_get_mac_binary boarddata1 0x0) 1
 		ath11k_patch_mac $(mtd_get_mac_binary boarddata1 0x6) 2
+		ath11k_set_macflag
+		;;
+	netgear,rbr750|\
+	netgear,rbs750)
+		caldata_extract "0:art" 0x1000 0x20000
+		label_mac=$(get_mac_label_dt)
+		ath11k_patch_mac $(macaddr_add $label_mac 3) 0
+		ath11k_patch_mac $(macaddr_add $label_mac 2) 1
+		ath11k_patch_mac $(macaddr_add $label_mac 4) 2
 		ath11k_set_macflag
 		;;
 	netgear,sxr80|\
@@ -99,6 +109,19 @@ case "$FIRMWARE" in
 	spectrum,sax1v1k)
 		caldata_extract_mmc "0:ART" 0x1000 0x20000
 		;;
+	tcl,linkhub-hh500v)
+		caldata_extract "0:ART" 0x1000 0x20000
+		ath11k_patch_mac $(mtd_get_mac_binary "0:ART" 0x5e29c) 0
+		ath11k_patch_mac $(mtd_get_mac_binary "0:ART" 0x5e2a2) 1
+		ath11k_set_macflag
+		;;
+	tplink,deco-x80-5g)
+		caldata_extract "0:art" 0x1000 0x20000
+		label_mac=$(get_mac_binary /tmp/factory_data/default-mac 0)
+		ath11k_patch_mac $(macaddr_add $label_mac -1) 0
+		ath11k_patch_mac $(macaddr_add $label_mac -2) 1
+		ath11k_set_macflag
+		;;
 	tplink,eap620hd-v1|\
 	tplink,eap660hd-v1)
 		caldata_from_file "/tmp/factory_data/radio" 0 0x20000
@@ -122,6 +145,20 @@ case "$FIRMWARE" in
 		ath11k_patch_mac $(macaddr_add $label_mac 4) 2
 		ath11k_set_macflag
 		;;
+	zyxel,nwa110ax)
+		caldata_extract "0:art" 0x1000 0x20000
+		label_mac=$(get_mac_label)
+		ath11k_patch_mac $(macaddr_add $label_mac 2) 0
+		ath11k_patch_mac $(macaddr_add $label_mac 1) 1
+		ath11k_set_macflag
+		;;
+	zyxel,nwa210ax)
+		caldata_extract "0:art" 0x1000 0x20000
+		label_mac=$(get_mac_label)
+		ath11k_patch_mac $(macaddr_add $label_mac 3) 0
+		ath11k_patch_mac $(macaddr_add $label_mac 2) 1
+		ath11k_set_macflag
+		;;
 	esac
 	;;
 "ath11k/QCN9074/hw1.0/cal-pci-0000:01:00.0.bin"|\
@@ -134,7 +171,8 @@ case "$FIRMWARE" in
 	prpl,haze)
 		caldata_extract_mmc "0:ART" 0x26800 0x20000
 		;;
-	xiaomi,ax9000)
+	xiaomi,ax9000|\
+	xiaomi,ax9000-stock)
 		caldata_extract "0:art" 0x26800 0x20000
 		;;
 	esac

@@ -10,9 +10,9 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=unetd
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL=$(PROJECT_GIT)/project/unetd.git
-PKG_SOURCE_DATE:=2025-01-29
-PKG_SOURCE_VERSION:=082b5482b97f20dc4745bc3d645e33b584cc28e4
-PKG_MIRROR_HASH:=090e7dab3b9a3358706dcee4f1889b7a1f0bdf535f2d6a0580f4160e23ccf9cb
+PKG_SOURCE_DATE:=2026-02-15
+PKG_SOURCE_VERSION:=52e504192ea746632e99abd75f07438c0237ff1a
+PKG_MIRROR_HASH:=a0a2d2aefb6789795e048e15b762bffba8303c2ca6a32b34337d5034faac5c4f
 
 PKG_LICENSE:=GPL-2.0
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
@@ -32,7 +32,7 @@ define Package/unetd
   SECTION:=net
   CATEGORY:=Network
   TITLE:=WireGuard based VPN connection manager for OpenWrt
-  DEPENDS:=+libubox +libubus +libblobmsg-json +libnl-tiny +kmod-wireguard +UNETD_VXLAN_SUPPORT:libbpf
+  DEPENDS:=+libubox +libubus +libudebug +libblobmsg-json +libnl-tiny +kmod-wireguard +UNETD_VXLAN_SUPPORT:libbpf
 endef
 
 define Package/unetd/config

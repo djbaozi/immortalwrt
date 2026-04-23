@@ -20,6 +20,8 @@ PKG_LICENSE:=bzip2-1.0.8
 PKG_LICENSE_FILES:=LICENSE
 PKG_CPE_ID:=cpe:/a:bzip:bzip2
 
+PKG_BUILD_FLAGS:=no-lto
+
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
 
@@ -62,7 +64,7 @@ CONFIGURE_ARGS += --prefix=/usr
 
 MAKE_FLAGS += \
 	-f Makefile-libbz2_so \
-	CFLAGS="$(TARGET_CFLAGS)" \
+	CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS)" \
 	LDFLAGS="$(TARGET_LDFLAGS)" \
 	all
 
@@ -92,7 +94,7 @@ HOST_CFLAGS += \
 	$(FPIC)
 
 HOST_MAKE_FLAGS+= \
-	CFLAGS="$(HOST_CFLAGS)" \
+	CFLAGS="$(HOST_CFLAGS) $(HOST_CPPFLAGS)" \
 	LDFLAGS="$(HOST_LDFLAGS)" \
 	all
 

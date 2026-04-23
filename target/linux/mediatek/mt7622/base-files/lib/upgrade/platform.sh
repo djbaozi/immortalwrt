@@ -1,5 +1,5 @@
 REQUIRE_IMAGE_METADATA=1
-RAMFS_COPY_BIN='fitblk'
+RAMFS_COPY_BIN='fitblk fit_check_sign'
 
 platform_do_upgrade() {
 	local board=$(board_name)
@@ -9,6 +9,7 @@ platform_do_upgrade() {
 	bananapi,bpi-r64|\
 	linksys,e8450-ubi|\
 	tplink,tl-xdr3230-v1|\
+	tplink,tl-xdr3250-v1|\
 	ubnt,unifi-6-lr-v1-ubootmod|\
 	ubnt,unifi-6-lr-v2-ubootmod|\
 	ubnt,unifi-6-lr-v3-ubootmod|\
@@ -21,6 +22,7 @@ platform_do_upgrade() {
 		;;
 	dlink,eagle-pro-ai-m32-a1|\
 	dlink,eagle-pro-ai-r32-a1|\
+	elecom,wrc-g01|\
 	elecom,wrc-x3200gst3|\
 	mediatek,mt7622-rfb1-ubi|\
 	netgear,wax206|\
@@ -61,6 +63,7 @@ platform_check_image() {
 		;;
 	dlink,eagle-pro-ai-m32-a1|\
 	dlink,eagle-pro-ai-r32-a1|\
+	elecom,wrc-g01|\
 	elecom,wrc-x3200gst3|\
 	mediatek,mt7622-rfb1-ubi|\
 	netgear,wax206|\
@@ -70,11 +73,8 @@ platform_check_image() {
 		return $?
 		;;
 	*)
-		[ "$magic" != "d00dfeed" ] && {
-			echo "Invalid image type."
-			return 1
-		}
-		return 0
+		fit_check_image "$1"
+		return $?
 		;;
 	esac
 

@@ -72,9 +72,9 @@ define Device/buffalo_ls421de
   KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage none
   DEVICE_DTS := armada-370-buffalo-ls421de
   DEVICE_PACKAGES :=  \
-    kmod-rtc-rs5c372a kmod-hwmon-gpiofan kmod-hwmon-drivetemp kmod-usb3 \
-    kmod-linkstation-poweroff kmod-md-raid0 kmod-md-raid1 kmod-md-mod \
-    kmod-fs-xfs mkf2fs e2fsprogs partx-utils
+    kmod-rtc-rs5c372a kmod-hwmon-gpiofan kmod-hwmon-drivetemp \
+    kmod-usb-xhci-pci-renesas kmod-linkstation-poweroff kmod-md-raid0 \
+    kmod-md-raid1 kmod-md-mod kmod-fs-xfs mkf2fs e2fsprogs partx-utils
 endef
 TARGET_DEVICES += buffalo_ls421de
 
@@ -91,7 +91,7 @@ define Device/ctera_c200-v2
   KERNEL_SUFFIX := -factory.firm
   DEVICE_PACKAGES :=  \
     kmod-gpio-button-hotplug kmod-hwmon-drivetemp kmod-hwmon-nct7802 \
-    kmod-rtc-s35390a kmod-usb3 kmod-usb-ledtrig-usbport
+    kmod-rtc-s35390a kmod-usb-xhci-pci-renesas kmod-usb-ledtrig-usbport
   IMAGES := sysupgrade.bin
 endef
 TARGET_DEVICES += ctera_c200-v2
@@ -134,6 +134,16 @@ define Device/fortinet_fg-30e
     gzip-filename FGT30E
 endef
 TARGET_DEVICES += fortinet_fg-30e
+
+define Device/fortinet_fwf-30e
+  $(Device/fortinet)
+  DEVICE_MODEL := FortiWiFi 30E
+  DEVICE_DTS := armada-385-fortinet-fwf-30e
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | fortigate-header | \
+    gzip-filename FWF30E
+  DEVICE_PACKAGES += kmod-ath9k wpad-openssl
+endef
+TARGET_DEVICES += fortinet_fwf-30e
 
 define Device/fortinet_fg-50e
   $(Device/fortinet)
@@ -209,7 +219,8 @@ TARGET_DEVICES += iij_sa-w2
 define Device/iptime_nas1dual
   DEVICE_VENDOR := ipTIME
   DEVICE_MODEL := NAS1dual
-  DEVICE_PACKAGES := kmod-hwmon-drivetemp kmod-hwmon-gpiofan kmod-usb3
+  DEVICE_PACKAGES := kmod-hwmon-drivetemp kmod-hwmon-gpiofan \
+    kmod-usb-xhci-pci-renesas
   SOC := armada-385
   KERNEL := kernel-bin | append-dtb | iptime-naspkg nas1dual
   KERNEL_SIZE := 6144k
@@ -405,7 +416,7 @@ define Device/solidrun_clearfog-base-a1
   DEVICE_MODEL := ClearFog Base
   KERNEL_INSTALL := 1
   KERNEL := kernel-bin
-  DEVICE_PACKAGES := mkf2fs e2fsprogs partx-utils
+  DEVICE_PACKAGES := mkf2fs e2fsprogs partx-utils kmod-dsa-mv88e6xxx
   IMAGES := sdcard.img.gz
   IMAGE/sdcard.img.gz := boot-scr | boot-img-ext4 | sdcard-img-ext4 | gzip | append-metadata
   DEVICE_DTS := armada-388-clearfog-base armada-388-clearfog-pro
@@ -423,7 +434,7 @@ define Device/solidrun_clearfog-pro-a1
   DEVICE_MODEL := ClearFog Pro
   KERNEL_INSTALL := 1
   KERNEL := kernel-bin
-  DEVICE_PACKAGES := mkf2fs e2fsprogs partx-utils
+  DEVICE_PACKAGES := mkf2fs e2fsprogs partx-utils kmod-dsa-mv88e6xxx
   IMAGES := sdcard.img.gz
   IMAGE/sdcard.img.gz := boot-scr | boot-img-ext4 | sdcard-img-ext4 | gzip | append-metadata
   DEVICE_DTS := armada-388-clearfog-pro armada-388-clearfog-base
@@ -451,6 +462,23 @@ define Device/synology_ds213j
     -ppp -kmod-nft-offload -dnsmasq -odhcpd-ipv6only
 endef
 TARGET_DEVICES += synology_ds213j
+
+define Device/wd_cloud-ex2-ultra
+  $(Device/NAND-128K)
+  DEVICE_VENDOR := Western Digital
+  DEVICE_MODEL := MyCloud EX2 Ultra
+  DEVICE_PACKAGES += -uboot-envtools mkf2fs e2fsprogs \
+	partx-utils kmod-hwmon-drivetemp -ppp -kmod-nft-offload -dnsmasq \
+	-odhcpd-ipv6only 
+  DEVICE_DTS := armada-385-wd_cloud-ex2-ultra
+  KERNEL_SIZE := 5120k
+  KERNEL := kernel-bin | append-dtb | uImage none
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | uImage none
+  IMAGES += image-cfs-factory.bin uImage-factory.bin
+  IMAGE/image-cfs-factory.bin := append-ubi
+  IMAGE/uImage-factory.bin := append-kernel
+endef
+TARGET_DEVICES += wd_cloud-ex2-ultra
 
 define Device/wd_cloud-mirror-gen2
   $(Device/NAND-128K)
