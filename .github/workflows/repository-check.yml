@@ -1,0 +1,39 @@
+name: OpenWrt Repository Check
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  repository-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Verify repository structure
+      run: |
+        echo "=== OpenWrt Repository Structure Check ==="
+        echo ""
+        
+        # Check essential files
+        echo "Essential files:"
+        [ -f Makefile ] && echo "✅ Makefile exists" || echo "❌ Makefile missing"
+        [ -f feeds.conf.default ] && echo "✅ feeds.conf.default exists" || echo "❌ feeds.conf.default missing"
+        [ -f rules.mk ] && echo "✅ rules.mk exists" || echo "❌ rules.mk missing"
+        [ -d include ] && echo "✅ include directory exists" || echo "❌ include directory missing"
+        [ -d package ] && echo "✅ package directory exists" || echo "❌ package directory missing"
+        
+        echo ""
+        echo "Repository size:"
+        du -sh . | awk '{print "Total size: "$1}'
+        
+        echo ""
+        echo "File count:"
+        find . -type f | wc -l | awk '{print "Total files: "$1}'
+        
+        echo ""
+        echo "=== Repository check completed ==="
