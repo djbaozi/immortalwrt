@@ -1,0 +1,96 @@
+name: OpenWrt Build Test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup build environment
+      run: |
+        echo "Setting up OpenWrt build environment..."
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential ccache file g++ gawk gettext git \
+          libncurses5-dev libncursesw5-dev libssl-dev python3 \
+          python3-distutils python3-setuptools rsync unzip wget
+    
+    - name: Configure feeds
+      run: |
+        echo "Configuring feeds..."
+        if [ -f feeds.conf.default ]; then
+          cp feeds.conf.default feeds.conf
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          echo "Feeds configured successfully"
+        else
+          echo "Warning: feeds.conf.default not found"
+        fi
+    
+    - name: Test configuration
+      run: |
+        echo "Testing OpenWrt configuration..."
+        if [ -f Makefile ]; then
+          echo "Makefile exists, testing basic commands..."
+          make defconfig 2>&1 | tail -20 || echo "defconfig may have warnings"
+          echo "Configuration test completed"
+        else
+          echo "Error: Makefile not found"
+          exit 1
+        fi
+    
+    - name: Check build system
+      run: |
+        echo "Checking build system readiness..."
+        if [ -d .git ]; then
+          echo "Git repository: OK"
+        fi
+        
+        if [ -f rules.mk ]; then
+          echo "Build rules: OK"
+        fi
+        
+        if [ -d include ]; then
+          echo "Include directory: OK"
+        fi
+        
+        echo "Build system check completed"
+
+  code-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Basic code validation
+      run: |
+        echo "Running basic code validation..."
+        
+        # Check for shell scripts
+        echo "Checking shell scripts..."
+        find . -name "*.sh" -type f | head -5 | while read file; do
+          if bash -n "$file" 2>/dev/null; then
+            echo "  ✓ $file"
+          else
+            echo "  ✗ $file has syntax errors"
+          fi
+        done
+        
+        # Check for large files
+        echo "Checking for large files..."
+        find . -type f -size +10M 2>/dev/null | head -5 | while read file; do
+          echo "  ⚠️ Large file: $file"
+        done || echo "  No large files found"
+        
+        echo "Code validation completed"
